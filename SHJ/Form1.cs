@@ -1801,7 +1801,7 @@ namespace SHJ
                     isregedit = false;
                     try
                     {
-                        
+                        //之前注册失败设置为0
                         myregxmldoc.SelectSingleNode("reg").Attributes.GetNamedItem("regid").Value = mregdata.ToString();
                         myregxmldoc.Save(regxmlfile);
                     }
