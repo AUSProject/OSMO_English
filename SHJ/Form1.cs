@@ -1772,17 +1772,16 @@ namespace SHJ
             }
             else if ((GSMRxBuffer[0] == 0x01) && (GSMRxBuffer[1] == 0x71) && (GSMRxBuffer[5] == 0x10))	//注册
             {
+                UInt64 mregdata = 0;
+                for (i = 0; i < 15; i++)
+                {
+                    mregdata = (mregdata << 8) + (byte)(IMEI[i] & 0x77);
+                }
                 if (GSMRxBuffer[12] == 0)	//注册成功
                 {
                     isregedit = true;
                     try
                     {
-                        UInt64 mregdata = 0;
-                        for (i = 0; i < 15; i++)
-                        {
-                            mregdata = (mregdata << 8) + (byte)(IMEI[i] & 0x77);
-                        }
-
                         myregxmldoc.SelectSingleNode("reg").Attributes.GetNamedItem("regid").Value = mregdata.ToString();
                         myregxmldoc.Save(regxmlfile);
                         mynetcofignode.Attributes.GetNamedItem("ipconfig").Value =
@@ -1802,7 +1801,8 @@ namespace SHJ
                     isregedit = false;
                     try
                     {
-                        myregxmldoc.SelectSingleNode("reg").Attributes.GetNamedItem("regid").Value = "0";
+                        
+                        myregxmldoc.SelectSingleNode("reg").Attributes.GetNamedItem("regid").Value = mregdata.ToString();
                         myregxmldoc.Save(regxmlfile);
                     }
                     catch
@@ -4137,7 +4137,6 @@ namespace SHJ
                     showprintstate = "machine malfunction";
                     break;
                 default:
-                    //showprintstate = Form1.extendstate[0].ToString("X") + ",waiting for pickup"; ;
                     break;
             }
             label5.Text = showprinttime + showprintstate+"...  " + (numNow--).ToString() + "s";
