@@ -588,6 +588,7 @@ namespace SHJ
         private int myminute;//分钟计时
         private void timer1_Tick(object sender, EventArgs e)//1s
         {
+
             if (myminute < 59)//最长1分钟，循环时间
             {
                 myminute++;
@@ -914,6 +915,7 @@ namespace SHJ
                 count = 0;
                 MachineErrorInspect();
                 PrintErrorInspect2();
+                Zhashou();
             }
             if (HMIstep == 0)//广告
             {
@@ -1200,6 +1202,7 @@ namespace SHJ
             {
                 if (CodeEntity.FaultCode==0 && CodeEntity.RunCode == 0 && (PEPrinter.TrayCondition & 0x01) == 0x01)
                 {
+                    this.Enabled = true;
                     HMIstep = 1;
                     isextbusy = 0;
                     inCallBack = true;
@@ -1208,9 +1211,11 @@ namespace SHJ
                     endCallBack = true;
                     numNow = 150;
                     PricessAction = false;
+                    needopensettingform = true;
                 }
             }
         }
+        
 
         #endregion
         
@@ -3489,139 +3494,6 @@ namespace SHJ
 
         #region 下位机操作
 
-        //public static bool needsetextend;
-        //public static byte setextenddata;//向下位机发送数据字
-        
-        //public static byte[] extendstate = new byte[2];//向下位机状态数据字
-        //public static string STM32Sendstr;//发送日志
-        //public static string STM32Recestr;//接收日志
-
-        //public static bool needresetVM;
-        //public static bool needsetVM;
-        //public static string VMSendstr;//发送日志
-        //public static string VMRecestr;//接收日志
-
-        //private void setextend()
-        //{
-
-        //    STM32TXBUF[0] = 0x7B;
-        //    STM32TXBUF[1] = 0x05;
-        //    switch(setextenddata)
-        //    {
-        //        case 0x00://复位机器
-        //        case 0x02://继续制作，从打印机取打印面
-        //        case 0x03://停止制作
-        //        case 0x04://制作界面上按钮（放盒子托盘弹出回收）
-        //        case 0x09://软件补货（保留）
-        //        case 0x10://A轴归零点
-        //        case 0x11://B轴归零点
-        //        case 0x12://Z1轴归零点
-        //            STM32TXBUF[2] = setextenddata;
-        //            STM32TXBUF[3] = 0x00;
-        //            break;
-        //        case 0x01://开始制作，向打印机放打印面
-        //            STM32TXBUF[2] = setextenddata;
-        //            STM32TXBUF[3] = (byte)wulihuodao;
-        //            break;
-        //    }
-        //    STM32TXBUF[4] = 0x00;
-        //    STM32TXBUF[5] = 0x04;
-        //    myPLCPort.Write(STM32TXBUF, 0, 6);
-
-        //    STM32Sendstr = DateTime.Now.ToString("ss.fff") + "s->";
-        //    for (int revcount = 0; revcount < 6; revcount++)
-        //    {
-        //        STM32Sendstr += " " + STM32TXBUF[revcount].ToString("X2");
-        //    }
-        //}
-
-        //private void queryextend()
-        //{
-        //    STM32TXBUF[0] = 0x7B;
-        //    STM32TXBUF[1] = 0x03;
-        //    STM32TXBUF[2] = 0x00;
-        //    STM32TXBUF[3] = 0x00;
-        //    STM32TXBUF[4] = 0x00;
-        //    STM32TXBUF[5] = 0x04;
-        //    myPLCPort.Write(STM32TXBUF, 0, 6);
-
-        //    STM32Sendstr = DateTime.Now.ToString("ss.fff") + "s->";
-        //    for (int revcount = 0; revcount < 6; revcount++)
-        //    {
-        //        STM32Sendstr += " " + STM32TXBUF[revcount].ToString("X2");
-        //    }
-        //}
-
-        //private void setPLCdata()
-        //{
-        //    if(setextenddata == 0x01)
-        //    {
-        //        Modbusdata = (setextenddata + (wulihuodao<<8)).ToString();
-        //    }
-        //    else
-        //    {
-        //        Modbusdata = setextenddata.ToString();
-        //    }
-        //    //          Modbusdataaddr = 118;
-        //    Modbusdataaddr = 118;
-        //    setModbusdata = true;
-        //}
-
-        //private void setVM()
-        //{
-        //    VMTXBUF[0] = 0x01;
-        //    VMTXBUF[1] = 0x05;
-        //    VMTXBUF[2] = (byte)((wulihuodao - 1) % 100);
-
-        //    UInt16 temp = crcVal(VMTXBUF, 3);
-
-        //    VMTXBUF[3] = (byte)temp;
-        //    VMTXBUF[4] = (byte)(temp >> 8);
-        //    myVMPort.Write(VMTXBUF, 0, 5);
-        //    VMRXcount = 0;//接收返回数据长度清零
-
-        //    VMSendstr = DateTime.Now.ToString("ss.fff") + "s->";
-        //    for (int revcount = 0; revcount < 5; revcount++)
-        //    {
-        //        VMSendstr += " " + VMTXBUF[revcount].ToString("X2");
-        //    }
-        //}
-
-        //private void resetVM()
-        //{
-        //    VMTXBUF[0] = 0x01;
-        //    VMTXBUF[1] = 0x06;
-        //    UInt16 temp = crcVal(VMTXBUF, 2);
-
-        //    VMTXBUF[2] = (byte)temp;
-        //    VMTXBUF[3] = (byte)(temp >> 8);
-        //    myVMPort.Write(VMTXBUF, 0, 4);
-        //    VMRXcount = 0;//接收返回数据长度清零
-
-        //    VMSendstr = DateTime.Now.ToString("ss.fff") + "s->";
-        //    for (int revcount = 0; revcount < 4; revcount++)
-        //    {
-        //        VMSendstr += " " + VMTXBUF[revcount].ToString("X2");
-        //    }
-        //}
-
-        //private void queryVM()
-        //{
-        //    VMTXBUF[0] = 0x01;
-        //    VMTXBUF[1] = 0x03;
-        //    UInt16 temp = crcVal(VMTXBUF, 2);
-
-        //    VMTXBUF[2] = (byte)temp;
-        //    VMTXBUF[3] = (byte)(temp >> 8);
-        //    myVMPort.Write(VMTXBUF, 0, 4);
-        //    VMRXcount = 0;//接收返回数据长度清零
-
-        //    VMSendstr = DateTime.Now.ToString("ss.fff") + "s->";
-        //    for (int revcount = 0; revcount < 4; revcount++)
-        //    {
-        //        VMSendstr += " " + VMTXBUF[revcount].ToString("X2");
-        //    }
-        //}
 
         private int needreturnHMIstep1 = 0;//返回到选货界面1计时
 
@@ -3634,92 +3506,6 @@ namespace SHJ
 
         public static bool needopensettingform;
 
-
-        //private void myVMPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        //{
-        //    byte[] mtempbyte = new byte[myVMPort.ReadBufferSize];
-        //    int readlen = myVMPort.Read(mtempbyte, 0, myVMPort.ReadBufferSize);
-
-        //    ushort i = 0;
-        //    for (i = 0; i < readlen; i++)
-        //    {
-        //        if (VMRXcount + i >= RXTXBUFLEN)
-        //        {
-        //            break;
-        //        }
-        //        VMRXBUF[VMRXcount + i] = mtempbyte[i];
-        //    }
-        //    VMRXcount += i;
-
-        //    if (VMRXBUF[0] != 0x00)//帧头不正确，重新接收数据
-        //    {
-        //        VMRXcount = 0;
-        //    }
-        //    //有一帧数据
-        //    while (((VMRXcount >= 5) && (VMRXBUF[0] == 0x00) && (VMRXBUF[1] == 0x05))//设置 
-        //        || ((VMRXcount >= 13) && (VMRXBUF[0] == 0x00) && (VMRXBUF[1] == 0x03))//查询
-        //        || (VMRXcount >= 14))//达到最长的一种
-        //    {
-        //        if ((VMRXBUF[0] == 0x00) && (VMRXBUF[1] == 0x05))//设置返回
-        //        {
-        //            UInt16 temp = crcVal(VMRXBUF, 3);
-        //            if (temp == VMRXBUF[3] + ((UInt16)VMRXBUF[4] << 8))
-        //            {
-        //                //设置完成
-
-        //            }
-        //            VMRecestr = DateTime.Now.ToString("ss.fff") + "s<-";
-        //            for (int revcount = 0; revcount < VMRXcount; revcount++)
-        //            {
-        //                VMRecestr += " " + VMRXBUF[revcount].ToString("X2");
-        //            }
-        //            //减去一帧
-        //            for (i = 5; i < VMRXcount; i++)
-        //            {
-        //                VMRXBUF[i - 5] = VMRXBUF[i];
-        //            }
-        //            VMRXcount -= 5;
-        //        }
-        //        else if ((VMRXBUF[0] == 0x00) && (VMRXBUF[1] == 0x03))//查询返回
-        //        {
-        //            UInt16 temp = crcVal(VMRXBUF, 11);
-        //            if (temp == VMRXBUF[11] + ((UInt16)VMRXBUF[12] << 8))
-        //            {
-        //                //处理查询结果
-        //                if (VMRXBUF[2] == 0x02)
-        //                {
-        //                    needresetVM = true;
-
-        //                    if (VMRXBUF[4] == 0)//出货成功
-        //                    {
-
-        //                    }
-        //                }
-        //                else if (VMRXBUF[2] == 0x01)
-        //                {
-        //                    //isextbusy = 1;//出货中
-        //                }
-        //                else if (VMRXBUF[2] == 0x00)
-        //                {
-        //                    //isextbusy = 0;//空闲
-        //                }
-        //            }
-
-        //            VMRecestr = DateTime.Now.ToString("ss.fff") + "s<-";
-        //            for (int revcount = 0; revcount < VMRXcount; revcount++)
-        //            {
-        //                VMRecestr += " " + VMRXBUF[revcount].ToString("X2");
-        //            }
-        //            //减去一帧
-        //            for (i = 13; i < VMRXcount; i++)
-        //            {
-        //                VMRXBUF[i - 13] = VMRXBUF[i];
-        //            }
-        //            VMRXcount -= 13;
-        //        }
-        //    }
-            
-        //}
         
         #endregion
 
@@ -3799,10 +3585,11 @@ namespace SHJ
             }
 
         }
-
+        
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            HMIstep = 1;//触摸选货界面
+                HMIstep = 1;//触摸选货界面
+            
             BUYstep = 0;
             renewpaystate = true;
             axWindowsMediaPlayer1.Visible = false;
@@ -4193,6 +3980,36 @@ namespace SHJ
                 return false;
         }
 
+        private void Zhashou()
+        {
+            short error = new PCHMI.VAR().GET_INT16(0, "1001010");
+            switch (error)
+            {
+                case 0:
+                    break;
+                case 1:
+                    MessageBox.Show("通用错误");
+                    break;
+                case 2:
+                    MessageBox.Show("电机错误");
+                    break;
+                case 3:
+                    MessageBox.Show("位置超差");
+                    break;
+                case 4:
+                    MessageBox.Show("速度超差");
+                    break;
+                case 5:
+                    MessageBox.Show("电机堵转");
+                    break;
+                case 6:
+                    MessageBox.Show("初相励错误");
+                    break;
+                default:
+                    break;
+            }
+        }
+
         /// <summary>
         /// 设备错误检测
         /// </summary>
@@ -4282,6 +4099,7 @@ namespace SHJ
         /// </summary>
         private void PricessTiming()
         {
+            
             if (PricessAction)
             {
                 if (numNow == 147)

@@ -1939,9 +1939,9 @@ namespace SHJ
 
         private void buttonGoBack_Click(object sender, EventArgs e)
         {
+            new PCHMI.VAR().SEND_CTRL(0, "000114", "复位", "");
             PCHMI.CONFIG.PLC_OFF[0] = true;
             panelBackGroud.Visible = false;
-
         }
 
         #endregion
@@ -1962,21 +1962,7 @@ namespace SHJ
             PEPrinterupdatedelay = 1;
             needsave = true;
         }
-
-        //private void hScrollBar4_ValueChanged(object sender, EventArgs e)
-        //{
-        //    label34.Text = "Print Left and Right Correction:" + hScrollBar4.Value.ToString();
-        //    PEPrinterupdatedelay = 1;
-        //    needsave = true;
-        //}
-
-        //private void hScrollBar5_ValueChanged(object sender, EventArgs e)
-        //{
-        //    label36.Text = "print top and bottom correction:" + hScrollBar5.Value.ToString();
-        //    PEPrinterupdatedelay = 1;
-        //    needsave = true;
-        //}
-
+        
         #endregion
 
         #region HideButton
