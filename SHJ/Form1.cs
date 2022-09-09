@@ -25,6 +25,37 @@ namespace SHJ
         [DllImport("user32.dll", EntryPoint = "ShowCursor", CharSet = CharSet.Auto)]
         public extern static void ShowCursor(int status);
 
+        [System.Runtime.InteropServices.DllImport("kernel32")]
+        private static extern bool WritePrivateProfileString(string section, string key, string val, string filePath);
+
+        [System.Runtime.InteropServices.DllImport("kernel32")]
+        private static extern bool GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+
+        /// <summary>
+        /// 写入ini文件
+        /// </summary>
+        /// <param name="section">名称</param>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        /// <param name="path">路径</param>
+        private void IniWriteValue(string section, string key, string value, string path)
+        {
+            WritePrivateProfileString(section, key, value, path);
+        }
+
+        /// <summary>
+        /// 读取INI文件
+        /// </summary>
+        /// <param name="section">项目名称</param>
+        /// <param name="key">键</param>
+        /// <param name="path">路径</param>
+        private string IniReadValue(string section, string key, string path)
+        {
+            StringBuilder temp = new StringBuilder(6000);
+            GetPrivateProfileString(section, key, "error", temp, 6000, path);
+            return temp.ToString();
+        }
+
         #region Form1MethodCallBack
 
         private static Form1 nowform1;
@@ -80,6 +111,8 @@ namespace SHJ
         #region Feild
 
         //private static int shouyao=0;//是否是售药机0tongyong1shouyao2shuangkaishouyao
+
+        private string imageUrlFile;//图片下载地址文件夹
 
         public static bool needcloseform = false;//是否需要关闭窗体
         public static int HMIstep;//界面页面：0广告 1触摸选择商品 2支付页面
@@ -268,6 +301,8 @@ namespace SHJ
             this.panel3.Dock = DockStyle.Fill;
             this.panel4.Dock = DockStyle.Fill;
 
+            imageUrlFile = Directory.GetCurrentDirectory() + "imageUrl.ini";
+
             adimagesaddress = System.IO.Directory.GetCurrentDirectory() + "\\adimages";
             bkimagesaddress = System.IO.Directory.GetCurrentDirectory() + "\\bkimages";
             cmimagesaddress = System.IO.Directory.GetCurrentDirectory() + "\\cmimages";
@@ -308,7 +343,10 @@ namespace SHJ
             {
                 System.IO.Directory.CreateDirectory(dataaddress);
             }
-
+            if (!File.Exists(imageUrlFile))//图片路径文件
+            {
+                File.Create(imageUrlFile);
+            }
 
             if (System.IO.File.Exists(configxmlfile))
             {
@@ -402,17 +440,7 @@ namespace SHJ
                 mysalexmldoc.Save(salexmlfile);
                 mysalexmldoc.Save(salexmlfilecopy);
             }
-
-            //if (System.IO.File.Exists(PLCxmlfile))//加载PLC配置文件
-            //{
-            //    PLCxmldoc.Load(PLCxmlfile);
-            //}
-            //else
-            //{
-            //    initPLCxml();
-            //    PLCxmldoc.Save(PLCxmlfile);
-            //}
-
+            
             if (System.IO.File.Exists(regxmlfile))//加载注册文件
             {
                 myregxmldoc.Load(regxmlfile);
@@ -906,6 +934,29 @@ namespace SHJ
         int count = 0;
         private void timer2_Tick(object sender, EventArgs e)
         {
+            if(ImageDownFinshi.ContainsKey(false))//印章图案下载失败，重新下载
+            {
+                string saveFileName = ImageDownFinshi[false];
+                string urlstring=IniReadValue(saveFileName, "url", imageUrlFile);
+                List<string> folders = new List<string>()
+                        {
+                          urlstring
+                        };
+                List<DownloadFile> downloadFiles = new List<DownloadFile>();
+                Parallel.ForEach(folders, folder =>
+                {
+                    downloadFiles.AddRange(ReadFileUrl(urlstring, saveFileName));
+                });
+                List<Task> tList = new List<Task>();
+                downloadFiles.ForEach(p =>
+                {
+                    tList.Add(
+                        DownloadingDataFromServerAsync(p)
+                    );
+                });
+                Task.WaitAll(tList.ToArray());
+            }
+
             if (count < 10)
             {
                 count++;
@@ -1543,10 +1594,6 @@ namespace SHJ
                             }
                         }
                     }
-                    //if (i >= mynodelistshangpin.Count)
-                    //{
-                    //    sendRETURNOK(3, false);
-                    //}
                 }
                 catch
                 {
@@ -1666,6 +1713,32 @@ namespace SHJ
                                                             //long length = fileInfo.Length;
                                                             if (bcmimagefiles[m].Contains(myTihuomastr))
                                                             {
+                                                                FileInfo file = new FileInfo(bcmimagefiles[m]);
+                                                                if (file.Length == 0)
+                                                                {
+                                                                    tihuoma.tihuomaresult="Image download failed, re-downloading";
+
+                                                                    string saveFileName = bcmimagefiles[m];
+                                                                    string urlstring = IniReadValue(saveFileName, "url", imageUrlFile);
+                                                                    List<string> folders = new List<string>()
+                                                                     {
+                                                                          urlstring
+                                                                      };
+                                                                    List<DownloadFile> downloadFiles = new List<DownloadFile>();
+                                                                    Parallel.ForEach(folders, folder =>
+                                                                    {
+                                                                        downloadFiles.AddRange(ReadFileUrl(urlstring, saveFileName));
+                                                                    });
+                                                                    List<Task> tList = new List<Task>();
+                                                                    downloadFiles.ForEach(p =>
+                                                                    {
+                                                                        tList.Add(
+                                                                            DownloadingDataFromServerAsync(p)
+                                                                        );
+                                                                    });
+                                                                    Task.WaitAll(tList.ToArray());
+                                                                }
+
                                                                 setchuhuo();
                                                                 //if (liushui[0] == liushuirecv)
                                                                 {
@@ -1831,6 +1904,9 @@ namespace SHJ
                         }
 
                         string saveFileName = bcmimagesaddress + "\\" + updatetimestring + ".jpg";
+
+                        IniWriteValue("saveFileName", "url", urlstring, imageUrlFile);//保存路径和名称
+                        
                         List<string> folders = new List<string>()
                         {
                           urlstring
@@ -1867,6 +1943,8 @@ namespace SHJ
             }
         }
 
+        private Dictionary<bool, string> ImageDownFinshi = new Dictionary<bool, string>();
+
         /// <summary>
         /// 下载用方法
         /// </summary>
@@ -1887,11 +1965,11 @@ namespace SHJ
                 }
                 catch (WebException )
                 {
-
+                    ImageDownFinshi.Add(false, saveFileName);
                 }
                 catch (Exception )
                 {
-
+                    ImageDownFinshi.Add(false, saveFileName);
                 }
             }
         }
