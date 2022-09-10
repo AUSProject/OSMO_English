@@ -189,11 +189,11 @@ namespace SHJ
 
         private void button9_Click(object sender, EventArgs e)//确认提货
         {
-            //if (SummaryCheck())
-            //{
-            //    textBox1.Text = "";
-            //    return;
-            //}
+            if (SummaryCheck())
+            {
+                textBox1.Text = "";
+                return;
+            }
 
             this.label2.Focus();//获取焦点
             if (textBox1.Text.Length == 7)//提货码小于七位

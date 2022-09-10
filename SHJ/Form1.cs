@@ -25,6 +25,7 @@ namespace SHJ
         [DllImport("user32.dll", EntryPoint = "ShowCursor", CharSet = CharSet.Auto)]
         public extern static void ShowCursor(int status);
 
+        #region Ini
         [System.Runtime.InteropServices.DllImport("kernel32")]
         private static extern bool WritePrivateProfileString(string section, string key, string val, string filePath);
 
@@ -55,6 +56,7 @@ namespace SHJ
             GetPrivateProfileString(section, key, "error", temp, 6000, path);
             return temp.ToString();
         }
+        #endregion
 
         #region Form1MethodCallBack
 
@@ -113,6 +115,8 @@ namespace SHJ
         //private static int shouyao=0;//是否是售药机0tongyong1shouyao2shuangkaishouyao
 
         private string imageUrlFile;//图片下载地址文件夹
+
+        private string ErweimaUrl = "https://fun.shachihata-china.com/boot/make/qmyz/SHAK/";//二维码地址
 
         public static bool needcloseform = false;//是否需要关闭窗体
         public static int HMIstep;//界面页面：0广告 1触摸选择商品 2支付页面
@@ -294,6 +298,10 @@ namespace SHJ
         {
             nowform1 = this;
 
+            label_erweima.Visible = false;
+            pic_erweima.Visible = false;//隐藏二维码
+            
+
             config1.START((Control)this, System.Reflection.Assembly.GetExecutingAssembly(), null);
 
             this.panel1.Dock = DockStyle.Fill;
@@ -444,6 +452,12 @@ namespace SHJ
             if (System.IO.File.Exists(regxmlfile))//加载注册文件
             {
                 myregxmldoc.Load(regxmlfile);
+                string adress = myregxmldoc.SelectSingleNode("reg").Attributes.GetNamedItem("regid").Value;
+                ErweimaUrl = String.Concat(ErweimaUrl, adress);
+                if (!File.Exists(Path.Combine(adimagesaddress, "erweima.jpg")))
+                {
+                    QRCode(ErweimaUrl);
+                }
             }
             else
             {
@@ -602,6 +616,8 @@ namespace SHJ
             qrCodeEncoder.QRCodeScale = 5;
             qrCodeEncoder.QRCodeVersion = 8;
             qrCodeEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.L;
+
+            pic_erweima.Image = Image.FromFile(Path.Combine(adimagesaddress, "erweima.jpg"));
 
         }
 
@@ -982,6 +998,9 @@ namespace SHJ
                 this.panel3.Visible = false;//支付界面关闭显示
                 this.panel4.Visible = false;//出货界面关闭显示
                 this.pictureBox1.Focus();//获取焦点
+
+                pic_erweima.Visible = true;
+                label_erweima.Visible = true;
             }
             else if (HMIstep == 1)//选货界面
             {
@@ -4193,6 +4212,21 @@ namespace SHJ
         }
 
         #endregion
+
+        private void  QRCode(string url)
+        {
+            Bitmap bt;
+            QRCodeEncoder qrCode = new QRCodeEncoder();
+            qrCode.QRCodeEncodeMode = QRCodeEncoder.ENCODE_MODE.BYTE;
+            qrCode.QRCodeScale = 4;
+            qrCode.QRCodeVersion = 0;
+            qrCode.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.M;
+            qrCode.QRCodeBackgroundColor = Color.Wheat;
+            qrCode.QRCodeForegroundColor = Color.Black;
+            bt = qrCodeEncoder.Encode(url, Encoding.UTF8);
+            string erweimaImgName = "erweima.jpg";
+            bt.Save(Path.Combine(adimagesaddress , erweimaImgName));
+        }
         
     }
     public class DownloadFile

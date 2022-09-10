@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            PCHMI.limits limits1 = new PCHMI.limits();
+            PCHMI.limits limits5 = new PCHMI.limits();
             this.panel1 = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
             this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
@@ -81,6 +81,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.timer4 = new System.Windows.Forms.Timer(this.components);
             this.config1 = new PCHMI.CONFIG();
+            this.pic_erweima = new System.Windows.Forms.PictureBox();
+            this.label_erweima = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -95,17 +97,20 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pic_erweima)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.pic_erweima);
+            this.panel1.Controls.Add(this.label_erweima);
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.axWindowsMediaPlayer1);
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Location = new System.Drawing.Point(672, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(623, 140);
+            this.panel1.Size = new System.Drawing.Size(1886, 1029);
             this.panel1.TabIndex = 0;
             this.panel1.Visible = false;
             // 
@@ -702,14 +707,35 @@
             this.config1.数据路径 = "D:\\";
             this.config1.画面 = null;
             this.config1.登录方式 = PCHMI.CONFIG.LOGType.快速登录;
-            limits1.PLC = ((uint)(0u));
-            limits1.地址 = "";
-            limits1.限制类型 = PCHMI.limits.LType.无效;
-            this.config1.运行限制 = limits1;
+            limits5.PLC = ((uint)(0u));
+            limits5.地址 = "";
+            limits5.限制类型 = PCHMI.limits.LType.无效;
+            this.config1.运行限制 = limits5;
             this.config1.通讯配置 = new string[] {
         resources.GetString("config1.通讯配置")};
             this.config1.通讯配置文件名 = "PortCheck";
             this.config1.随机数保存地址 = null;
+            // 
+            // pic_erweima
+            // 
+            this.pic_erweima.BackColor = System.Drawing.Color.Transparent;
+            this.pic_erweima.Location = new System.Drawing.Point(1680, 831);
+            this.pic_erweima.Name = "pic_erweima";
+            this.pic_erweima.Size = new System.Drawing.Size(160, 160);
+            this.pic_erweima.TabIndex = 15;
+            this.pic_erweima.TabStop = false;
+            // 
+            // label_erweima
+            // 
+            this.label_erweima.AutoSize = true;
+            this.label_erweima.BackColor = System.Drawing.Color.Transparent;
+            this.label_erweima.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_erweima.ForeColor = System.Drawing.Color.Chocolate;
+            this.label_erweima.Location = new System.Drawing.Point(1634, 1004);
+            this.label_erweima.Name = "label_erweima";
+            this.label_erweima.Size = new System.Drawing.Size(249, 25);
+            this.label_erweima.TabIndex = 16;
+            this.label_erweima.Text = "WeChat scan code to buy";
             // 
             // Form1
             // 
@@ -730,6 +756,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel3.ResumeLayout(false);
@@ -746,6 +773,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pic_erweima)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -803,6 +831,8 @@
         private System.Windows.Forms.Button button2;
         public System.Windows.Forms.Timer timer4;
         public PCHMI.CONFIG config1;
+        private System.Windows.Forms.PictureBox pic_erweima;
+        private System.Windows.Forms.Label label_erweima;
     }
 }
 
